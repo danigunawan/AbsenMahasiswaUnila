@@ -27,8 +27,7 @@
 
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:noHistory="true">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -36,22 +35,18 @@
         </activity>
         <activity
             android:name=".ListJadwalActivity"
-            android:label="Jadwal Hari Ini"
-            android:noHistory="true">
+            android:label="Jadwal Hari Ini">
             <action android:name="android.intent.action.SEARCH" />
 
             <category android:name="android.intent.category.DEFAULT" />
         </activity>
-        <activity android:name=".BukaCameraActivity"
-            android:noHistory="true">
+        <activity android:name=".BukaCameraActivity">
         </activity>
         <activity android:name=".JadwalBesokActivity"
-            android:label="Jadwal Besok"
-            android:noHistory="true">
+            android:label="Jadwal Besok">
         </activity>
         <activity android:name=".JadwalLusaActivity"
-            android:label="Jadwal Lusa"
-            android:noHistory="true">
+            android:label="Jadwal Lusa">
         </activity>
     </application>
 

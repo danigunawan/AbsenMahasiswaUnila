@@ -266,7 +266,6 @@ public class BukaCameraActivity extends AppCompatActivity implements GoogleApiCl
 
                   // JIKA BITMAP TIDAK SAMA DENGAN NULL
                   if (bitmap != null){
-
                       // MAKA JALANKAN PROSES ABSEN
                       AbsenMasuk(id_jadwal, username, id_ruangan, jarak_ke_lokasi_absen, waktu_jadwal, tanggal);// PASSING ID JADWAL DAN USERNAME
                   }
@@ -301,7 +300,6 @@ public class BukaCameraActivity extends AppCompatActivity implements GoogleApiCl
             public void onResponse(Call<Value> call, Response<Value> response) {
 
                 String value = response.body().getValue();// DAPATKAN  VALUE
-                String message = response.body().getMessage();// DAPATKAN  MESSAGE
                 progress.dismiss();// CLOSE PROGRESS
 
                 // JIKA VALUE BERNILAI 1
