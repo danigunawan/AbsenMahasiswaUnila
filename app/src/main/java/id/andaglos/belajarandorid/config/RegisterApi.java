@@ -17,18 +17,36 @@ public interface RegisterApi {
                                 @Field("nama_akhir") String nama_akhir);
 
     @FormUrlEncoded
-    @POST("login_dosen_android")
-    Call<Value>prosesLogin(@Field("username") String username,
+    @POST("login_mahasiswa_android")
+    Call<Value>prosesLoginMahasiswa(@Field("username") String username,
                                 @Field("password") String password);
 
     @FormUrlEncoded
-    @POST("list_jadwal_dosen")
+    @POST("list_jadwal_mahasiswa")
     Call<Value>listJadwal(@Field("username") String username );
 
     @FormUrlEncoded
-    @POST("search_jadwal_dosen")
+    @POST("jadwal_besok")
+    Call<Value>jadwalBesok(@Field("username") String username );
+
+    @FormUrlEncoded
+    @POST("jadwal_lusa")
+    Call<Value>jadwalLusa(@Field("username") String username );
+
+    @FormUrlEncoded
+    @POST("search_jadwal_mahasiswa")
     Call<Value>searchJadwal(@Field("search") String search,
                             @Field("username") String username);
+
+    @FormUrlEncoded
+    @POST("search_jadwal_mahasiswa_besok")
+    Call<Value>searchJadwalBesok(@Field("search") String search,
+                                 @Field("username") String username);
+
+    @FormUrlEncoded
+    @POST("search_jadwal_mahasiswa_lusa")
+    Call<Value>searchJadwalLusa(@Field("search") String search,
+                                 @Field("username") String username);
 
 
     @FormUrlEncoded
@@ -36,8 +54,8 @@ public interface RegisterApi {
     Call<Value>batalJadwalDosen(@Field("id_jadwal") String id_jadwal);
 
     @FormUrlEncoded
-    @POST("presensi_dosen")
-    Call<Value>presensiDosen(@Field("id_jadwal") String id_jadwal,
+    @POST("presensi_mahasiswa")
+    Call<Value>presensiMahasiswa(@Field("id_jadwal") String id_jadwal,
                              @Field("username") String username,
                              @Field("id_ruangan") String id_ruangan,
                              @Field("image") String image,

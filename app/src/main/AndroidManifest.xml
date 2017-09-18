@@ -36,12 +36,18 @@
         </activity>
         <activity
             android:name=".ListJadwalActivity"
-            android:label="List Jadwal Dosen">
+            android:label="Jadwal Hari Ini">
             <action android:name="android.intent.action.SEARCH" />
 
             <category android:name="android.intent.category.DEFAULT" />
         </activity>
         <activity android:name=".BukaCameraActivity" />
+        <activity android:name=".JadwalBesokActivity"
+            android:label="Jadwal Besok">
+            </activity>
+        <activity android:name=".JadwalLusaActivity"
+            android:label="Jadwal Lusa">
+        </activity>
     </application>
 
 </manifest>

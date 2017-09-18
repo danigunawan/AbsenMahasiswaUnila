@@ -294,7 +294,7 @@ public class BukaCameraActivity extends AppCompatActivity implements GoogleApiCl
         // BUAT OBJEK BARU UNTUK CRUD SERVICE
         CrudService crud = new CrudService();
         // CRUD PRESENSI DOSEN=
-        crud.presensiDosen(id_jadwal, username,id_ruangan, encodedImage,
+        crud.presensiMahasiswa(id_jadwal, username,id_ruangan, encodedImage,
                 String.valueOf(latitude_sekarang), String.valueOf(longitude_sekarang),
                 String.valueOf(round(jarak_ke_lokasi_absen)),waktu_jadwal,tanggal,new Callback<Value>() {
             @Override
@@ -370,7 +370,7 @@ public class BukaCameraActivity extends AppCompatActivity implements GoogleApiCl
 
         AlertDialog.Builder AbsenGagal = new AlertDialog.Builder(BukaCameraActivity.this);
         // set title dialog
-        AbsenGagal.setTitle("Anda sudah absen di jadwal ini!");
+        AbsenGagal.setTitle("Anda Sudah Melakukan Absen Pada Jadwal Ini!");
 
 
         // set pesan dialog
@@ -396,7 +396,7 @@ public class BukaCameraActivity extends AppCompatActivity implements GoogleApiCl
 
         AlertDialog.Builder AbsenGagal = new AlertDialog.Builder(BukaCameraActivity.this);
         // set title dialog
-        AbsenGagal.setTitle("Jadwal ini belum dimulai!");
+        AbsenGagal.setTitle("Jadwal Ini Belum Dimulai!");
 
 
         // set pesan dialog

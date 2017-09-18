@@ -45,25 +45,42 @@ public class CrudService {
         registerApi.daftarMahasiswa(nama_awal , nama_akhir).enqueue(callback);
     }
 
-    public void prosesLogin(String username, String password, Callback callback){
-        registerApi.prosesLogin(username , password).enqueue(callback);
-    }    
+    public void prosesLoginMahasiswa(String username, String password, Callback callback){
+        registerApi.prosesLoginMahasiswa(username , password).enqueue(callback);
+    }
 
     public void listJadwal(String username, Callback callback){
         registerApi.listJadwal(username).enqueue(callback);
     }
+
+    public void jadwalBesok(String username, Callback callback){
+        registerApi.jadwalBesok(username).enqueue(callback);
+    }
+
+    public void jadwalLusa(String username, Callback callback){
+        registerApi.jadwalLusa(username).enqueue(callback);
+    }
+
     public void searchJadwal(String search , String username,Callback callback){
         registerApi.searchJadwal(search,username).enqueue(callback);
+    }
+
+    public void searchJadwalBesok(String search , String username,Callback callback){
+        registerApi.searchJadwalBesok(search,username).enqueue(callback);
+    }
+
+    public void searchJadwalLusa(String search , String username,Callback callback){
+        registerApi.searchJadwalLusa(search,username).enqueue(callback);
     }
 
     public void batalJadwalDosen(String id_jadwal,Callback callback){
         registerApi.batalJadwalDosen(id_jadwal).enqueue(callback);
     }
 
-    public void presensiDosen(String id_jadwal, String username, String id_ruangan , String image ,
+    public void presensiMahasiswa(String id_jadwal, String username, String id_ruangan , String image ,
                               String latitude_sekarang, String longitude_sekarang, String jarak_ke_lokasi_absen,
                               String waktu_jadwal, String tanggal, Callback callback){
-        registerApi.presensiDosen(id_jadwal,username, id_ruangan,image, latitude_sekarang,
+        registerApi.presensiMahasiswa(id_jadwal,username, id_ruangan,image, latitude_sekarang,
                 longitude_sekarang, jarak_ke_lokasi_absen,waktu_jadwal, tanggal).enqueue(callback);
     }
 

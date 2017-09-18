@@ -5,8 +5,20 @@
     <item
         android:id="@+id/list_jadwal_dosen"
         android:orderInCategory="100"
-        android:title="List Jadwal"
+        android:title="Jadwal Hari Ini"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/jadwal_hari_ini"
+        android:orderInCategory="100"
+        android:title="Jadwal Besok"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/jadwal_lusa"
+        android:orderInCategory="100"
+        android:title="Jadwal Lusa"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/logout"
         android:orderInCategory="100"

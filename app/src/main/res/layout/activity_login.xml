@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Absen Dosen"
+            android:text="Absen Mahasiswa"
             android:textColor="@android:color/white"
             android:textColorHighlight="@android:color/primary_text_dark"
             android:layout_centerVertical="true"

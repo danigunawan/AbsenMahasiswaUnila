@@ -28,7 +28,7 @@ import com.kishan.askpermission.PermissionInterface;
 import java.util.ArrayList;
 import java.util.List;
 
-import id.andaglos.belajarandorid.adapter.RecyclerViewAdapter;
+import id.andaglos.belajarandorid.adapter.JadwalAdapter;
 import id.andaglos.belajarandorid.config.CrudService;
 import id.andaglos.belajarandorid.config.Result;
 import id.andaglos.belajarandorid.config.Value;
@@ -36,13 +36,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ListJadwalActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, PermissionCallback, ErrorCallback {
+public class JadwalLusaActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, PermissionCallback, ErrorCallback{
 
     // declrasikan variable yang dibutuhkan
     private static final int REQUEST_PERMISSIONS = 20;
 
     private List<Result> results = new ArrayList<>();// result
-    private RecyclerViewAdapter viewAdapter;// viewAdapter
+    private JadwalAdapter viewAdapter;// viewAdapter
     private ImageView imageView;// image view
     private TextView jadwal_kosong; // text view jadwal kosong
 
@@ -60,7 +60,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_jadwal);
+        setContentView(R.layout.activity_jadwal_lusa);
 
         // inisiasi variable
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -69,7 +69,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         imageView = (ImageView) findViewById(R.id.ImageKosong);
         jadwal_kosong = (TextView) findViewById(R.id.jadwal_kosong);
 
-        viewAdapter = new RecyclerViewAdapter(this, results);
+        viewAdapter = new JadwalAdapter(this, results);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -79,19 +79,19 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         String login_username = shared.getString(username, "");
 
         // passing varibel username
-        loadDataJadwal(login_username);
+        loadDataJadwalLusa(login_username);
 
-         reqPermission();
+        reqPermission();
     }
 
     // proses menampilkan list jadwal dosen
-    public void loadDataJadwal(String username) {
+    public void loadDataJadwalLusa(String username) {
 
         imageView.setVisibility(View.GONE);// hidden Image View
         jadwal_kosong.setVisibility(View.GONE);// hidden Text Jadwal Kosong
 
         CrudService crud = new CrudService();
-        crud.listJadwal(username,new Callback <Value>() {
+        crud.jadwalLusa(username,new Callback<Value>() {
             @Override
             public void onResponse(Call<Value> call, Response<Value> response) {
 
@@ -107,7 +107,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
                 }else{// jika tidak
                     // tampilkan lsit jadwal
                     results = response.body().getResult();
-                    viewAdapter = new RecyclerViewAdapter(ListJadwalActivity.this, results);
+                    viewAdapter = new JadwalAdapter(JadwalLusaActivity.this, results);
                     recyclerView.setAdapter(viewAdapter);
                 }
             }
@@ -116,7 +116,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
             public void onFailure(Call call, Throwable t) {// jika terjadi throwble
 
                 progressBar.setVisibility(View.GONE);// hidden progressbar
-                Toast.makeText(ListJadwalActivity.this, "Terjadi Kesalahan!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(JadwalLusaActivity.this, "Terjadi Kesalahan!", Toast.LENGTH_SHORT).show();
                 // toast terjadi KEsalahan
                 t.printStackTrace();
 
@@ -143,7 +143,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         String username = (shared.getString(loginusername, ""));
 
         CrudService crud = new CrudService();
-        crud.searchJadwal(newText,username, new Callback<Value>() {
+        crud.searchJadwalLusa(newText,username, new Callback<Value>() {
             @Override
             public void onResponse(Call<Value> call, Response<Value> response) {
 
@@ -155,7 +155,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
                 if (value.equals("1")) {
                     // maka akan tampil jadwal yang dicari
                     results = response.body().getResult();
-                    viewAdapter = new RecyclerViewAdapter(ListJadwalActivity.this, results);
+                    viewAdapter = new JadwalAdapter(JadwalLusaActivity.this, results);
                     recyclerView.setAdapter(viewAdapter);
                 }
             }
@@ -164,7 +164,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
             public void onFailure(Call call, Throwable t) {
 
                 progressBar.setVisibility(View.GONE); //hidden progressBar
-                Toast.makeText(ListJadwalActivity.this, "Terjadi Kesalahan!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(JadwalLusaActivity.this, "Terjadi Kesalahan!", Toast.LENGTH_SHORT).show();
 
                 t.printStackTrace();
 
@@ -193,16 +193,16 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         if (item.getItemId() ==  R.id.logout) {
             logout();
             finish();
-            startActivity( new Intent(ListJadwalActivity.this, LoginActivity.class));
+            startActivity( new Intent(JadwalLusaActivity.this, LoginActivity.class));
         }
         else if (item.getItemId() ==  R.id.list_jadwal_dosen){
-            startActivity( new Intent(ListJadwalActivity.this, ListJadwalActivity.class));
+            startActivity( new Intent(JadwalLusaActivity.this, ListJadwalActivity.class));
         }
         else if (item.getItemId() ==  R.id.jadwal_hari_ini){
-            startActivity( new Intent(ListJadwalActivity.this, JadwalBesokActivity.class));
+            startActivity( new Intent(JadwalLusaActivity.this, JadwalBesokActivity.class));
         }
         else if (item.getItemId() ==  R.id.jadwal_lusa){
-            startActivity( new Intent(ListJadwalActivity.this, JadwalLusaActivity.class));
+            startActivity( new Intent(JadwalLusaActivity.this, JadwalLusaActivity.class));
         }
 
 
@@ -224,7 +224,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         editor.commit();// simpan
     }
 
-// untuk menampilkan otomatis data terbaru.
+    // untuk menampilkan otomatis data terbaru.
     @Override
     protected void onResume() {
         super.onResume();
@@ -232,7 +232,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         SharedPreferences shared = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
         String login_username = (shared.getString(username, ""));
 
-        loadDataJadwal(login_username);
+        loadDataJadwalLusa(login_username);
     }
 
     public void reqPermission() {

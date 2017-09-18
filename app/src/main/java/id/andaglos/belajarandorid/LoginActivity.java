@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
 
         CrudService crud = new CrudService();// membuat object baru CrudService
         // arahkan ke proses login yang ada di crud service, untuk dikirim username dan passwordnya
-        crud.prosesLogin(edtUsername.getText().toString(), edtPassword.getText().toString(), new Callback<Value>() {
+        crud.prosesLoginMahasiswa(edtUsername.getText().toString(), edtPassword.getText().toString(), new Callback<Value>() {
             @Override
             public void onResponse(Call<Value> call, Response<Value> response) {
 
@@ -112,6 +112,7 @@ public class LoginActivity extends AppCompatActivity {
                     // munculkan toast message nya
                     edtUsername.setText("");// kosongkan input username
                     edtPassword.setText("");// kosongkan input password
+                    edtUsername.requestFocus();// focus ke input username
 
                 }else{// dan jika value 3
                     // user gagal login, karena user nya salah, atau passwordnya salah
@@ -121,6 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                     // munculkan toast message nya
                     edtUsername.setText("");// kosongkan input username
                     edtPassword.setText("");// kosongkan input password
+                    edtUsername.requestFocus();// focus ke input username
                 }
 
             }
@@ -134,6 +136,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Terjadi Kesalahan!", Toast.LENGTH_LONG).show();
                 // munculkan toast Terjadi kesalahan
                 t.printStackTrace();
+                edtUsername.requestFocus();// focus ke input username
             }
         });
 
