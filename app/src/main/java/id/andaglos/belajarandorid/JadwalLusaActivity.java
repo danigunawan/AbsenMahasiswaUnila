@@ -204,6 +204,9 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
         else if (item.getItemId() ==  R.id.jadwal_lusa){
             startActivity( new Intent(JadwalLusaActivity.this, JadwalLusaActivity.class));
         }
+        else if (item.getItemId() ==  R.id.ubah_password){
+            startActivity( new Intent(JadwalLusaActivity.this, UbahPasswordActivity.class));
+        }
 
 
         return super.onOptionsItemSelected(item);

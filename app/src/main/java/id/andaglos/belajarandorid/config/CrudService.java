@@ -84,6 +84,8 @@ public class CrudService {
                 longitude_sekarang, jarak_ke_lokasi_absen,waktu_jadwal, tanggal).enqueue(callback);
     }
 
-
+    public void UbahPasswordMahasiswa(String username ,String username_baru , String password_lama, String password_baru, Callback callback){
+        registerApi.UbahPasswordMahasiswa(username,username_baru, password_lama, password_baru).enqueue(callback);
+    }
 
 }

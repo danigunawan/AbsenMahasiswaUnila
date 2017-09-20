@@ -65,6 +65,13 @@ public interface RegisterApi {
                              @Field("waktu_jadwal") String waktu_jadwal,
                              @Field("tanggal") String tanggal);
 
+    @FormUrlEncoded
+    @POST("ubah_password_mahasiswa")
+    Call<Value>UbahPasswordMahasiswa(@Field("username") String username,
+                            @Field("username_baru") String username_baru,
+                            @Field("password_lama") String password_lama,
+                            @Field("password_baru") String password_baru);
+
 }
 
 

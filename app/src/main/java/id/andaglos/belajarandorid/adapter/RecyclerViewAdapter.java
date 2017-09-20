@@ -151,7 +151,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             // tombol absen
             public void onClick(DialogInterface dialog, int id) {
                 //jika tombol Absen di klik maka akan OTOMATIS MEMBUKA KAMRE
-                if (latitude == "" && longitude == ""){
+                if (latitude == "" || longitude == "" || batas_jarak_absen == ""){
                     AlertDialog.Builder pesan_alert = new AlertDialog.Builder(context);
                     // set title dialog
                     pesan_alert.setTitle("Pemberitahuan");
