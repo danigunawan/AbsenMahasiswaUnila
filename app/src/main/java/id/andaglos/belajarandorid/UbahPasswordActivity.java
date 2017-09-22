@@ -98,7 +98,13 @@ public class UbahPasswordActivity extends AppCompatActivity {
                 }else{
 
                     Toast.makeText(UbahPasswordActivity.this, message, Toast.LENGTH_LONG).show();
-                    // munculkan toast Terjadi kesalahan
+
+                    if(value.equals("0")){
+                        EdtPasswordLama.requestFocus();// focus ke input pasword lama
+                    }
+                    else{
+                        EdtUsernameBaru.requestFocus();// focus ke input username
+                    }
                 }
 
 

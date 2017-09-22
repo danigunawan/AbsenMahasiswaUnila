@@ -7,6 +7,7 @@ package id.andaglos.belajarandorid.config;
 public class Config {
 
 
-    public static final String BASE_URL = "https://192.168.1.25/JadwalDosen/public/";
+    public static final String BASE_URL = "http://192.168.137.25/JadwalDosen/public/";
+
 
 }
