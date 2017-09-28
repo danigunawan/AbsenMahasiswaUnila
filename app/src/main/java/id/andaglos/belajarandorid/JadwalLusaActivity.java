@@ -276,7 +276,7 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
 
     @Override
     public void onPermissionsGranted(int requestCode) {
-        Toast.makeText(this, "Perizinan Diterima", Toast.LENGTH_LONG).show();
+        
     }
 
     @Override
