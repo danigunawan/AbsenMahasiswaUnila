@@ -7,8 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
@@ -17,7 +18,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,6 +28,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.kishan.askpermission.AskPermission;
 import com.kishan.askpermission.ErrorCallback;
@@ -45,8 +47,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class JadwalLusaActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, PermissionCallback, ErrorCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class JadwalLusaActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, PermissionCallback, ErrorCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     // declrasikan variable yang dibutuhkan
     private static final int REQUEST_PERMISSIONS = 20;
@@ -56,8 +57,8 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
     private ImageView imageView;// image view
     private TextView jadwal_kosong; // text view jadwal kosong
 
-    private static final String TAG = JadwalLusaActivity.class.getSimpleName();
-    public double latitude_sekarang,longitude_sekarang;
+    private static final String TAG = UbahPasswordActivity.class.getSimpleName();
+
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
     private Location mLastLocation;
@@ -65,6 +66,8 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
 
+
+    private LocationRequest mLocationRequest;
 
     // Location updates intervals in sec
     private static int UPDATE_INTERVAL = 10000; // 10 sec
@@ -78,7 +81,7 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
     // untuk menyimpan data username yang sedang login
     SharedPreferences sharedpreferences;
 
-    public static final String MyPREFERENCES = "login" ;
+    public static final String MyPREFERENCES = "login";
     public static final String username = "usernameKey";
     public static final String loginusername = "usernameKey";
 
@@ -105,14 +108,13 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
 
         // passing varibel username
         loadDataJadwalLusa(login_username);
-
         reqPermission();
 
         // First we need to check availability of play services
         if (checkPlayServices()) {
 
-            // Building the GoogleApi client
             buildGoogleApiClient();
+            createLocationRequest();
         }
     }
 
@@ -123,7 +125,7 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
         jadwal_kosong.setVisibility(View.GONE);// hidden Text Jadwal Kosong
 
         CrudService crud = new CrudService();
-        crud.jadwalLusa(username,new Callback<Value>() {
+        crud.jadwalLusa(username, new Callback<Value>() {
             @Override
             public void onResponse(Call<Value> call, Response<Value> response) {
 
@@ -136,7 +138,7 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
                     imageView.setVisibility(View.VISIBLE);// Show Image View
                     jadwal_kosong.setVisibility(View.VISIBLE);// Hidden Text Jadwal Kosong
 
-                }else{// jika tidak
+                } else {// jika tidak
                     // tampilkan lsit jadwal
                     results = response.body().getResult();
                     viewAdapter = new JadwalAdapter(JadwalLusaActivity.this, results);
@@ -157,7 +159,6 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
     }
 
 
-
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
@@ -175,7 +176,7 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
         String username = (shared.getString(loginusername, ""));
 
         CrudService crud = new CrudService();
-        crud.searchJadwalLusa(newText,username, new Callback<Value>() {
+        crud.searchJadwalLusa(newText, username, new Callback<Value>() {
             @Override
             public void onResponse(Call<Value> call, Response<Value> response) {
 
@@ -222,22 +223,18 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         // logut
-        if (item.getItemId() ==  R.id.logout) {
+        if (item.getItemId() == R.id.logout) {
             logout();
             finish();
-            startActivity( new Intent(JadwalLusaActivity.this, LoginActivity.class));
-        }
-        else if (item.getItemId() ==  R.id.list_jadwal_dosen){
-            startActivity( new Intent(JadwalLusaActivity.this, ListJadwalActivity.class));
-        }
-        else if (item.getItemId() ==  R.id.jadwal_hari_ini){
-            startActivity( new Intent(JadwalLusaActivity.this, JadwalBesokActivity.class));
-        }
-        else if (item.getItemId() ==  R.id.jadwal_lusa){
-            startActivity( new Intent(JadwalLusaActivity.this, JadwalLusaActivity.class));
-        }
-        else if (item.getItemId() ==  R.id.ubah_password){
-            startActivity( new Intent(JadwalLusaActivity.this, UbahPasswordActivity.class));
+            startActivity(new Intent(JadwalLusaActivity.this, LoginActivity.class));
+        } else if (item.getItemId() == R.id.list_jadwal_dosen) {
+            startActivity(new Intent(JadwalLusaActivity.this, ListJadwalActivity.class));
+        } else if (item.getItemId() == R.id.jadwal_hari_ini) {
+            startActivity(new Intent(JadwalLusaActivity.this, JadwalBesokActivity.class));
+        } else if (item.getItemId() == R.id.jadwal_lusa) {
+            startActivity(new Intent(JadwalLusaActivity.this, JadwalLusaActivity.class));
+        } else if (item.getItemId() == R.id.ubah_password) {
+            startActivity(new Intent(JadwalLusaActivity.this, UbahPasswordActivity.class));
         }
 
 
@@ -245,30 +242,17 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         finish();
     }// jika user tekan tombol back
 
     // logout
-    public void logout (){
+    public void logout() {
 
         SharedPreferences preferences = getSharedPreferences("login", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();// edit sessionlogin
         editor.clear();// bersihkan session login
         editor.commit();// simpan
-    }
-
-    // untuk menampilkan otomatis data terbaru.
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        SharedPreferences shared = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
-        String login_username = (shared.getString(username, ""));
-
-        loadDataJadwalLusa(login_username);
-        checkPlayServices();
     }
 
     public void reqPermission() {
@@ -278,75 +262,6 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
                 .setCallback(this)
                 .setErrorCallback(this)
                 .request(REQUEST_PERMISSIONS);
-    }
-
-
-    /**
-     * Method to display the location on UI
-     * */
-    private void displayLocation() {
-
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi
-                .getLastLocation(mGoogleApiClient);
-
-        if (mLastLocation != null) {
-
-            latitude_sekarang =  mLastLocation.getLatitude();
-            longitude_sekarang = mLastLocation.getLongitude();
-
-
-
-        }
-    }
-
-    /**
-     * Creating google api client object
-     * */
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build();
-    }
-
-    /**
-     * Method to verify google play services on the devicedfhdfhknvk
-     * */
-    private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Toast.makeText(getApplicationContext(),
-                        "This device is not supported.", Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        }
     }
 
 
@@ -387,30 +302,109 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
         reqPermission();
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
 
+    //UPDATE LOKASI LATITUDE LONGITUDE
+
+    /**
+     * VERIFIKASI KE GOOGLE PLAY SERVICES
+     * */
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "This device is not supported.", Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Creating google api client object
+     * */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+    }
+
+    /**
+     * Creating location request object
+     * */
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT); // 10 meters
+    }
+
+    /**
+     * Starting the location updates
+     * */
+    protected void startLocationUpdates() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    /**
+     * Stopping location updates
+     */
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
 
+
+    // untuk menampilkan otomatis data terbaru.
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences shared = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
+        String login_username = (shared.getString(username, ""));
+
+        loadDataJadwalLusa(login_username);
+
+        // Resuming the periodic location updates
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+        }
     }
 
     @Override
-    public void onProviderEnabled(String s) {
-
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
     }
 
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
     @Override
     public void onConnected(Bundle arg0) {
-
-        // Once connected with google api, get the location
-        displayLocation();
+        startLocationUpdates();
     }
 
     @Override
@@ -418,13 +412,18 @@ public class JadwalLusaActivity extends AppCompatActivity implements SearchView.
         mGoogleApiClient.connect();
     }
 
-
-    /**
-     * Google api callback methods
-     */
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
-                + result.getErrorCode());
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // Assign the new location
+        mLastLocation = location;
+
+        Toast.makeText(getApplicationContext(), "Location Changed!",
+                Toast.LENGTH_SHORT).show();
+
     }
 }

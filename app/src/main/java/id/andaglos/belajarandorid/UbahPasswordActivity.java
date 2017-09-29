@@ -8,6 +8,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import id.andaglos.belajarandorid.config.CrudService;
@@ -37,12 +41,12 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
 
     SharedPreferences sharedpreferences; // untuk menyimpan data username yang sedang login
 
-    public static final String MyPREFERENCES = "login" ;
+    public static final String MyPREFERENCES = "login";
     public static final String username = "usernameKey";
     private ProgressDialog progress;// progress
 
     private static final String TAG = UbahPasswordActivity.class.getSimpleName();
-    public double latitude_sekarang,longitude_sekarang;
+
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
     private Location mLastLocation;
@@ -51,10 +55,13 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
     private GoogleApiClient mGoogleApiClient;
 
 
+    private LocationRequest mLocationRequest;
+
     // Location updates intervals in sec
     private static int UPDATE_INTERVAL = 10000; // 10 sec
     private static int FATEST_INTERVAL = 5000; // 5 sec
     private static int DISPLACEMENT = 10; // 10 meters
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +81,13 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
 
         EdtUsernameBaru.setText(username_edit);
 
-        BtnUbahPassword.setOnClickListener(new View.OnClickListener(){
+
+        BtnUbahPassword.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
 
-                if (vaidate_form() == true){
+                if (vaidate_form() == true) {
 
                     SharedPreferences shared = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
                     String username_edit = shared.getString(username, "");
@@ -94,15 +102,15 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
         // First we need to check availability of play services
         if (checkPlayServices()) {
 
-            // Building the GoogleApi client
             buildGoogleApiClient();
+            createLocationRequest();
         }
 
         EdtPasswordLama.requestFocus();// focus ke input pasword lama
     }
 
     //PROSES EDIT PASSWORD
-    private void ProsesEditPassword(String username_edit){
+    private void ProsesEditPassword(String username_edit) {
         /* progress */
         progress = new ProgressDialog(this);
         progress.setCancelable(false);
@@ -110,7 +118,7 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
         progress.show();// menampilkan progress
 
         CrudService crud = new CrudService();
-        crud.UbahPasswordMahasiswa(username_edit,EdtUsernameBaru.getText().toString(), EdtPasswordLama.getText().toString(), EdtPasswordBaru.getText().toString(), new Callback<Value>() {
+        crud.UbahPasswordMahasiswa(username_edit, EdtUsernameBaru.getText().toString(), EdtPasswordLama.getText().toString(), EdtPasswordBaru.getText().toString(), new Callback<Value>() {
             @Override
             public void onResponse(Call<Value> call, Response<Value> response) {
                 progress.dismiss();// progress ditutup
@@ -118,7 +126,7 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
                 String value = response.body().getValue();
                 String message = response.body().getMessage();
 
-                if (value.equals("1")){
+                if (value.equals("1")) {
 
                     //Edit Session login
                     SharedPreferences.Editor editor = sharedpreferences.edit();
@@ -127,14 +135,13 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
                     editor.commit();
 
                     BerhasilUbahPassword();
-                }else{
+                } else {
 
                     Toast.makeText(UbahPasswordActivity.this, message, Toast.LENGTH_LONG).show();
 
-                    if(value.equals("0")){
+                    if (value.equals("0")) {
                         EdtPasswordLama.requestFocus();// focus ke input pasword lama
-                    }
-                    else{
+                    } else {
                         EdtUsernameBaru.requestFocus();// focus ke input username
                     }
                 }
@@ -155,41 +162,41 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
     }
 
     //VALIDASI FORM UBAH USER DAN PASSWORD
-    private boolean vaidate_form(){
+    private boolean vaidate_form() {
         // jika username belum di isi
-        if (EdtUsernameBaru.getText().toString().equals("")){
+        if (EdtUsernameBaru.getText().toString().equals("")) {
 
             // maka muncul required
             EdtUsernameBaru.setError("Silahkan Isi Username Baru Anda!");
             EdtUsernameBaru.requestFocus();// focus ke input username
 
             return false;// return false
-        }else if (EdtPasswordLama.getText().toString().equals("")){
+        } else if (EdtPasswordLama.getText().toString().equals("")) {
 
             // maka muncul required
             EdtPasswordLama.setError("Silahkan Isi Password Lama Anda!");
             EdtPasswordLama.requestFocus();// focus ke input pasword lama
 
             return false;// return false
-        }else if (EdtPasswordBaru.getText().toString().equals("")){
+        } else if (EdtPasswordBaru.getText().toString().equals("")) {
 
             // maka muncul required
             EdtPasswordBaru.setError("Silahkan Isi Password Baru Anda!");
             EdtPasswordBaru.requestFocus();// focus ke input pasword baru
 
             return false;// return false
-        }else if (EdtKonfirmasiPassword.getText().toString().equals("")){
+        } else if (EdtKonfirmasiPassword.getText().toString().equals("")) {
 
             // maka muncul required
             EdtKonfirmasiPassword.setError("Silahkan Isi Konfirmasi Password Anda!");
             EdtKonfirmasiPassword.requestFocus();// focus ke input konfirmasi pasword
 
             return false;// return false
-        }else if (!EdtPasswordBaru.getText().toString().equals(EdtKonfirmasiPassword.getText().toString()) ) {
+        } else if (!EdtPasswordBaru.getText().toString().equals(EdtKonfirmasiPassword.getText().toString())) {
             // maka muncul required
             EdtKonfirmasiPassword.setError("Password Baru dan Konfirmasi Password Harus Sama!");
             EdtKonfirmasiPassword.requestFocus();
-            return  false;// return true
+            return false;// return true
         } else {
 
 
@@ -205,7 +212,7 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
         return true;
     }
 
-    private void BerhasilUbahPassword(){
+    private void BerhasilUbahPassword() {
         AlertDialog.Builder Alert = new AlertDialog.Builder(UbahPasswordActivity.this);
         // set title dialog
         Alert.setTitle("Username dan Password Berhasil Diubah");
@@ -220,7 +227,7 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
                 //jika tombol Ya di klik maka akan akan menjalankan proses batal absen
                 // KEMBALI KE ACTIVITY ListJadwalActivity
                 dialog.cancel();
-                startActivity(new Intent(UbahPasswordActivity.this,ListJadwalActivity.class));
+                startActivity(new Intent(UbahPasswordActivity.this, ListJadwalActivity.class));
 
             }
         });
@@ -234,22 +241,18 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         // logut
-        if (item.getItemId() ==  R.id.logout) {
+        if (item.getItemId() == R.id.logout) {
             logout();
             finish();
-            startActivity( new Intent(UbahPasswordActivity.this, LoginActivity.class));
-        }
-        else if (item.getItemId() ==  R.id.list_jadwal_dosen){
-            startActivity( new Intent(UbahPasswordActivity.this, ListJadwalActivity.class));
-        }
-        else if (item.getItemId() ==  R.id.jadwal_hari_ini){
-            startActivity( new Intent(UbahPasswordActivity.this, JadwalBesokActivity.class));
-        }
-        else if (item.getItemId() ==  R.id.jadwal_lusa){
-            startActivity( new Intent(UbahPasswordActivity.this, JadwalLusaActivity.class));
-        }
-        else if (item.getItemId() ==  R.id.ubah_password){
-            startActivity( new Intent(UbahPasswordActivity.this, UbahPasswordActivity.class));
+            startActivity(new Intent(UbahPasswordActivity.this, LoginActivity.class));
+        } else if (item.getItemId() == R.id.list_jadwal_dosen) {
+            startActivity(new Intent(UbahPasswordActivity.this, ListJadwalActivity.class));
+        } else if (item.getItemId() == R.id.jadwal_hari_ini) {
+            startActivity(new Intent(UbahPasswordActivity.this, JadwalBesokActivity.class));
+        } else if (item.getItemId() == R.id.jadwal_lusa) {
+            startActivity(new Intent(UbahPasswordActivity.this, JadwalLusaActivity.class));
+        } else if (item.getItemId() == R.id.ubah_password) {
+            startActivity(new Intent(UbahPasswordActivity.this, UbahPasswordActivity.class));
         }
 
 
@@ -257,46 +260,15 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
     }
 
     //PROSES LOGOUT
-    public void logout (){
+    public void logout() {
 
         SharedPreferences preferences = getSharedPreferences("login", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();// edit sessionlogin
         editor.clear();// bersihkan session login
         editor.commit();// simpan
     }
-    // untuk menampilkan otomatis data terbaru.
-    @Override
-    protected void onResume() {
-        super.onResume();
-        checkPlayServices();
-    }
 
-
-    /**
-     * Method to display the location on UI
-     * */
-    private void displayLocation() {
-
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi
-                .getLastLocation(mGoogleApiClient);
-
-        if (mLastLocation != null) {
-
-            latitude_sekarang =  mLastLocation.getLatitude();
-            longitude_sekarang = mLastLocation.getLongitude();
-        }
-    }
+    //UPDATE LOKASI LATITUDE DAN LONGITUDE
 
     /**
      * Creating google api client object
@@ -309,11 +281,22 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
     }
 
     /**
-     * Method to verify google play services on the devicedfhdfhknvk
+     * Creating location request object
+     * */
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT); // 10 meters
+    }
+
+
+    /**
+     * VERIFIKASI KE GOOGLE PLAY SERVICES
      * */
     private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(this);
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, this,
@@ -329,6 +312,34 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
         return true;
     }
 
+    /**
+     * Starting the location updates
+     * */
+    protected void startLocationUpdates() {
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+
+    }
+
+    /**
+     * Stopping location updates
+     */
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -337,17 +348,25 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
         }
     }
 
-
-
     @Override
-    public void onLocationChanged(Location location) {
+    protected void onResume() {
+        super.onResume();
+        // Resuming the periodic location updates
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+        }
 
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
     @Override
     public void onConnected(Bundle arg0) {
-
-        // Once connected with google api, get the location
-        displayLocation();
+            startLocationUpdates();
     }
 
     @Override
@@ -355,13 +374,18 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
         mGoogleApiClient.connect();
     }
 
-
-    /**
-     * Google api callback methods
-     */
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
-                + result.getErrorCode());
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // Assign the new location
+        mLastLocation = location;
+
+        Toast.makeText(getApplicationContext(), "Location Changed!",
+                Toast.LENGTH_SHORT).show();
+
     }
 }
