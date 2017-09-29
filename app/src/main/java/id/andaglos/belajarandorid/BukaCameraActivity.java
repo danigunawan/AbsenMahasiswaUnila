@@ -24,7 +24,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.ByteArrayOutputStream;
@@ -49,11 +48,6 @@ public class BukaCameraActivity extends AppCompatActivity implements GoogleApiCl
 
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
-
-    // boolean flag to toggle periodic location updates
-    private boolean mRequestingLocationUpdates = false;
-
-    private LocationRequest mLocationRequest;
 
     // Location updates intervals in sec
     private static int UPDATE_INTERVAL = 10000; // 10 sec
