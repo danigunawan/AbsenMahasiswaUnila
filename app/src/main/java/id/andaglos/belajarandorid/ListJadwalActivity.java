@@ -5,7 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +25,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.kishan.askpermission.AskPermission;
 import com.kishan.askpermission.ErrorCallback;
 import com.kishan.askpermission.PermissionCallback;
@@ -36,7 +47,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ListJadwalActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, PermissionCallback, ErrorCallback {
+public class ListJadwalActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, PermissionCallback, ErrorCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     // declrasikan variable yang dibutuhkan
     private static final int REQUEST_PERMISSIONS = 20;
@@ -46,12 +57,27 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
     private ImageView imageView;// image view
     private TextView jadwal_kosong; // text view jadwal kosong
 
+    private static final String TAG = UbahPasswordActivity.class.getSimpleName();
+
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+
+    private Location mLastLocation;
+
+    // Google client to interact with Google API
+    private GoogleApiClient mGoogleApiClient;
+
+
+    private LocationRequest mLocationRequest;
+
+    // Location updates intervals in sec
+    private static int UPDATE_INTERVAL = 10000; // 10 sec
+    private static int FATEST_INTERVAL = 5000; // 5 sec
+    private static int DISPLACEMENT = 10; // 10 meters
+
     SearchView search;// search/ pencarian
     RecyclerView recyclerView;// recyclerView
     ProgressBar progressBar;// progresabar
 
-    // untuk menyimpan data username yang sedang login
-    SharedPreferences sharedpreferences;
 
     public static final String MyPREFERENCES = "login" ;
     public static final String username = "usernameKey";
@@ -80,8 +106,14 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
 
         // passing varibel username
         loadDataJadwal(login_username);
+        reqPermission();
 
-         reqPermission();
+        // First we need to check availability of play services
+        if (checkPlayServices()) {
+
+            buildGoogleApiClient();
+            createLocationRequest();
+        }
     }
 
     // proses menampilkan list jadwal dosen
@@ -227,17 +259,6 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         editor.commit();// simpan
     }
 
-// untuk menampilkan otomatis data terbaru.
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        SharedPreferences shared = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
-        String login_username = (shared.getString(username, ""));
-
-        loadDataJadwal(login_username);
-    }
-
     public void reqPermission() {
         new AskPermission.Builder(this).setPermissions(
                 Manifest.permission.CAMERA,
@@ -274,6 +295,75 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         builder.show();
     }
 
+    //UPDATE LOKASI LATITUDE LONGITUDE
+
+    /**
+     * VERIFIKASI KE GOOGLE PLAY SERVICES
+     * */
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "This device is not supported.", Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Creating google api client object
+     * */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+    }
+
+    /**
+     * Creating location request object
+     * */
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT); // 10 meters
+    }
+
+    /**
+     * Starting the location updates
+     * */
+    protected void startLocationUpdates() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    /**
+     * Stopping location updates
+     */
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+
     @Override
     public void onPermissionsGranted(int requestCode) {
         Toast.makeText(this, "Perizinan Diterima", Toast.LENGTH_LONG).show();
@@ -284,4 +374,63 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         Toast.makeText(this, "Perizinan Tidak Diterima", Toast.LENGTH_LONG).show();
         reqPermission();
     }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    // untuk menampilkan otomatis data terbaru.
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences shared = getSharedPreferences(MyPREFERENCES, MODE_PRIVATE);
+        String login_username = (shared.getString(username, ""));
+
+        loadDataJadwal(login_username);
+
+        // Resuming the periodic location updates
+        if (mGoogleApiClient.isConnected()) {
+            startLocationUpdates();
+        }
+
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    @Override
+    public void onConnected(Bundle arg0) {
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int arg0) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // Assign the new location
+        mLastLocation = location;
+
+        Toast.makeText(getApplicationContext(), "Location Changed!",
+                Toast.LENGTH_SHORT).show();
+
+    }
+
 }
