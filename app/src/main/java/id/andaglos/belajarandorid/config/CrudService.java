@@ -9,6 +9,10 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static id.andaglos.belajarandorid.R.id.password_baru;
+import static id.andaglos.belajarandorid.R.id.password_lama;
+import static id.andaglos.belajarandorid.R.id.username_baru;
+
 /**
  * Created by Andaglos on 25/08/17.
  */
@@ -86,6 +90,10 @@ public class CrudService {
 
     public void UbahPasswordMahasiswa(String username ,String username_baru , String password_lama, String password_baru, Callback callback){
         registerApi.UbahPasswordMahasiswa(username,username_baru, password_lama, password_baru).enqueue(callback);
+    }
+
+    public void CekVersiAplikasi(Callback callback){
+        registerApi.CekVersiAplikasi().enqueue(callback);
     }
 
 }

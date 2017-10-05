@@ -3,6 +3,7 @@ package id.andaglos.belajarandorid.config;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 /**
@@ -71,6 +72,10 @@ public interface RegisterApi {
                             @Field("username_baru") String username_baru,
                             @Field("password_lama") String password_lama,
                             @Field("password_baru") String password_baru);
+
+
+    @GET("versi-absen-mahasiswa")
+    Call<Value> CekVersiAplikasi();
 
 }
 
