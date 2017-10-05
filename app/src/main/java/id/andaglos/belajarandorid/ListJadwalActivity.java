@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
@@ -70,8 +69,8 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
     private LocationRequest mLocationRequest;
 
     // Location updates intervals in sec
-    private static int UPDATE_INTERVAL = 10000; // 10 sec
-    private static int FATEST_INTERVAL = 5000; // 5 sec
+    private static int UPDATE_INTERVAL = 5000; // 5 sec
+    private static int FATEST_INTERVAL = 2000; // 2 sec
     private static int DISPLACEMENT = 10; // 10 meters
 
     SearchView search;// search/ pencarian
@@ -127,21 +126,32 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
             @Override
             public void onResponse(Call<Value> call, Response<Value> response) {
 
-                String value = response.body().getValue();// ambil vallue
-
                 progressBar.setVisibility(View.GONE);// hidden progressbar
 
-                if (value.equals("0")) {// jika value bernilai nol,
-                    // maka
+                try {
+
+                    String value = response.body().getValue();// ambil vallue
+
+
+
+                    if (value.equals("0")) {// jika value bernilai nol,
+                        // maka
+                        imageView.setVisibility(View.VISIBLE);// Show Image View
+                        jadwal_kosong.setVisibility(View.VISIBLE);// Hidden Text Jadwal Kosong
+
+                    }else{// jika tidak
+                        // tampilkan lsit jadwal
+                        results = response.body().getResult();
+                        viewAdapter = new RecyclerViewAdapter(ListJadwalActivity.this, results);
+                        recyclerView.setAdapter(viewAdapter);
+                    }
+
+                } catch (NullPointerException e){
                     imageView.setVisibility(View.VISIBLE);// Show Image View
                     jadwal_kosong.setVisibility(View.VISIBLE);// Hidden Text Jadwal Kosong
 
-                }else{// jika tidak
-                    // tampilkan lsit jadwal
-                    results = response.body().getResult();
-                    viewAdapter = new RecyclerViewAdapter(ListJadwalActivity.this, results);
-                    recyclerView.setAdapter(viewAdapter);
                 }
+
             }
 
             @Override
@@ -179,17 +189,26 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
             @Override
             public void onResponse(Call<Value> call, Response<Value> response) {
 
-                String value = response.body().getValue();
                 progressBar.setVisibility(View.GONE); //hidden progressBar
-                recyclerView.setVisibility(View.VISIBLE);// tampilkan recycle view
+                try {
 
-                // jika value bernilai 1
-                if (value.equals("1")) {
-                    // maka akan tampil jadwal yang dicari
-                    results = response.body().getResult();
-                    viewAdapter = new RecyclerViewAdapter(ListJadwalActivity.this, results);
-                    recyclerView.setAdapter(viewAdapter);
+                    String value = response.body().getValue();
+
+                    recyclerView.setVisibility(View.VISIBLE);// tampilkan recycle view
+
+                    // jika value bernilai 1
+                    if (value.equals("1")) {
+                        // maka akan tampil jadwal yang dicari
+                        results = response.body().getResult();
+                        viewAdapter = new RecyclerViewAdapter(ListJadwalActivity.this, results);
+                        recyclerView.setAdapter(viewAdapter);
+                    }
+
+                } catch (NullPointerException e){
+                    imageView.setVisibility(View.VISIBLE);// Show Image View
+                    jadwal_kosong.setVisibility(View.VISIBLE);// Hidden Text Jadwal Kosong
                 }
+
             }
 
             @Override
@@ -366,13 +385,15 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
 
     @Override
     public void onPermissionsGranted(int requestCode) {
-        Toast.makeText(this, "Perizinan Diterima", Toast.LENGTH_LONG).show();
+
     }
 
     @Override
     public void onPermissionsDenied(int requestCode) {
+
         Toast.makeText(this, "Perizinan Tidak Diterima", Toast.LENGTH_LONG).show();
         reqPermission();
+
     }
 
 
@@ -394,9 +415,13 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
 
         loadDataJadwal(login_username);
 
-        // Resuming the periodic location updates
-        if (mGoogleApiClient.isConnected()) {
-            startLocationUpdates();
+        checkPlayServices();
+
+        if (mGoogleApiClient != null) {
+            // Resuming the periodic location updates
+            if (mGoogleApiClient.isConnected()) {
+                startLocationUpdates();
+            }
         }
 
     }
@@ -410,6 +435,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
 
     @Override
     public void onConnected(Bundle arg0) {
+
         startLocationUpdates();
     }
 
@@ -428,8 +454,7 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         // Assign the new location
         mLastLocation = location;
 
-        Toast.makeText(getApplicationContext(), "Location Changed!",
-                Toast.LENGTH_SHORT).show();
+
 
     }
 

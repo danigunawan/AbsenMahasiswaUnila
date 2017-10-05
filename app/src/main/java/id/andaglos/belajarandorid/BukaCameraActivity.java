@@ -119,8 +119,6 @@ public class BukaCameraActivity extends AppCompatActivity implements GoogleApiCl
 
             hitung_jarak_absen();
 
-        } else {
-
         }
     }
 
@@ -424,10 +422,8 @@ public class BukaCameraActivity extends AppCompatActivity implements GoogleApiCl
         AbsenGagal.setTitle("Ruangan " + nama_ruangan +" Terlalu Jauh");
 
         TextView jarak_ruangan = (TextView) dialogView.findViewById(R.id.JarakKeRuangan);
-        TextView batas_jarak = (TextView) dialogView.findViewById(R.id.BatasJarakAbsen);
 
         jarak_ruangan.setText(String.valueOf(round(jarak_ke_lokasi_absen)) + " m");
-        batas_jarak.setText(batas_jarak_absen + " m");
 
         // set pesan dialog
         AbsenGagal.setIcon(R.drawable.logofinish);
