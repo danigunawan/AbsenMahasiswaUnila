@@ -257,6 +257,8 @@ public class ListJadwalActivity extends AppCompatActivity implements SearchView.
         }
         else if (item.getItemId() ==  R.id.ubah_password){
             startActivity( new Intent(ListJadwalActivity.this, UbahPasswordActivity.class));
+        }else if (item.getItemId() == R.id.foto_profile) {
+            startActivity(new Intent(ListJadwalActivity.this, ProfilActivity.class));
         }
 
 

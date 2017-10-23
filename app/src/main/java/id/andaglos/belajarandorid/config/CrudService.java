@@ -96,4 +96,12 @@ public class CrudService {
         registerApi.CekVersiAplikasi().enqueue(callback);
     }
 
+    public void CekProfilMahasiswa(String user, Callback callback){
+        registerApi.CekProfilMahasiswa(user).enqueue(callback);
+    }
+
+    public void UpdateProfil(String image, String user, Callback callback){
+        registerApi.UpdateProfil(image,user).enqueue(callback);
+    }
+
 }

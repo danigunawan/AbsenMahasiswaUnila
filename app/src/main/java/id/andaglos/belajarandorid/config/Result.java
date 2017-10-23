@@ -16,6 +16,10 @@ public class Result{
     String longitude;
     String batas_jarak_absen;
     String tipe_jadwal;
+    String foto_profilnya;
+    String nama_mahasiswa;
+    String no_telp;
+
 
     public String getTanggal(){
 
@@ -57,6 +61,14 @@ public class Result{
 
     public String getTipeJadwal(){
         return tipe_jadwal;
+    }
+
+    public String getFotoProfile(){ return foto_profilnya; }
+
+    public String getNamaMahasiswa(){ return nama_mahasiswa; }
+
+    public String getNoTelp(){
+        return no_telp;
     }
 
 }

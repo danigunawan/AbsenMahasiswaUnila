@@ -77,6 +77,15 @@ public interface RegisterApi {
     @GET("versi-absen-mahasiswa")
     Call<Value> CekVersiAplikasi();
 
+    @FormUrlEncoded
+    @POST("cek_profil_mahasiswa")
+    Call<Value>CekProfilMahasiswa(@Field("user") String user);
+    @FormUrlEncoded
+    @POST("update_profile_dosen")
+    Call<Value>UpdateProfil(@Field("image") String image,
+                             @Field("user") String user);
+
+
 }
 
 

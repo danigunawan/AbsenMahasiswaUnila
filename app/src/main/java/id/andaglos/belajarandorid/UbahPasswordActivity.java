@@ -238,7 +238,7 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
         alertDialog.show();
     }
 
-    @Override
+    @Override   
     public boolean onOptionsItemSelected(final MenuItem item) {
         // logut
         if (item.getItemId() == R.id.logout) {
@@ -253,6 +253,8 @@ public class UbahPasswordActivity extends AppCompatActivity implements GoogleApi
             startActivity(new Intent(UbahPasswordActivity.this, JadwalLusaActivity.class));
         } else if (item.getItemId() == R.id.ubah_password) {
             startActivity(new Intent(UbahPasswordActivity.this, UbahPasswordActivity.class));
+        }else if (item.getItemId() == R.id.foto_profile) {
+            startActivity(new Intent(UbahPasswordActivity.this, ProfilActivity.class));
         }
 
 

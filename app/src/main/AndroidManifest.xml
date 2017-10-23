@@ -38,20 +38,21 @@
             android:name=".ListJadwalActivity"
             android:label="Jadwal Hari Ini">
             <action android:name="android.intent.action.SEARCH" />
+
             <category android:name="android.intent.category.DEFAULT" />
         </activity>
-        <activity android:name=".BukaCameraActivity"></activity>
+        <activity android:name=".BukaCameraActivity" />
         <activity
             android:name=".JadwalBesokActivity"
-            android:label="Jadwal Besok"></activity>
+            android:label="Jadwal Besok" />
         <activity
             android:name=".JadwalLusaActivity"
-            android:label="Jadwal Lusa"></activity>
-        <activity android:name=".UbahPasswordActivity"
+            android:label="Jadwal Lusa" />
+        <activity
+            android:name=".UbahPasswordActivity"
             android:label="Ubah Password"
-            android:noHistory="true">
-
-        </activity>
+            android:noHistory="true"></activity>
+        <activity android:name=".ProfilActivity"></activity>
     </application>
 
 </manifest>
